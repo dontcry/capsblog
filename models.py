@@ -28,7 +28,7 @@ class Blog(db.Model):
   id = Column(Integer, primary_key=True)
   title = Column(String) 
 
-  def __init__(self, title):
+  def __init__(self, title): 
     self.title = title 
 
   def format(self):
