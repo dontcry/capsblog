@@ -1,5 +1,5 @@
 import json
-from flask import Flask, jsonify, request, abort
+from flask import Flask, render_template, jsonify, request, abort
 from models import setup_db, db, Blog
 from flask_cors import CORS
 
@@ -8,8 +8,7 @@ def parse_body(body_data):
     return json_data
 
 def create_app(test_config=None):
-
-    app = Flask(__name__) 
+    app = Flask(__name__,template_folder="frontend/dist/") 
     setup_db(app) 
     CORS(app, resource={r'/api/*': {'origins': '*'}})
     
@@ -22,12 +21,9 @@ def create_app(test_config=None):
                              'GET,PATCH,POST,DELETE,OPTIONS')
         return response
 
-    @app.route('/')
-    def get_greeting():
-        excited = 'true'
-        greeting = "Hello" 
-        if excited == 'true': greeting = greeting + "!!!!!!!!!"
-        return greeting
+    @app.route('/') 
+    def index():
+        return render_template('index.html')
 
     @app.route('/api/blogs')
     def show_blogs():
