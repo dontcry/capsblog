@@ -8,7 +8,12 @@ def parse_body(body_data):
     return json_data
 
 def create_app(test_config=None):
-    app = Flask(__name__,template_folder="frontend/dist/") 
+    app = Flask(__name__, 
+        template_folder="frontend/dist/",
+        static_folder="frontend/dist", 
+        static_url_path="") 
+
+    print(app.config)
     setup_db(app) 
     CORS(app, resource={r'/api/*': {'origins': '*'}})
     
