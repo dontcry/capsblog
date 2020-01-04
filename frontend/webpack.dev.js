@@ -16,7 +16,7 @@ const options = {
     entry: __dirname + "/src/index.jsx",
     output: {
         filename: '[name].bundle.js',
-        path: path.resolve(__dirname, 'dist/')
+        path: path.resolve(__dirname, 'dist/js/')
     },
     devtool: 'inline-source-map',
     devServer: {

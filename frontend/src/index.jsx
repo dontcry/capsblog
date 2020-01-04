@@ -1,18 +1,22 @@
 import React from 'react'
 import { render } from 'react-dom' 
 import { getBlogs } from './utils/api'
+import { DatePicker } from 'antd';
+
+
+
 class Hello extends React.Component {
     render() {
        return (
-           <p>hello react111223334444！</p>
+           <p>hello react</p>
         )
     }
 }
+let root = document.getElementById('root')
 render(
-    [<Hello/> ],
-    document.getElementById('root')
+    [<Hello/> ], root
 ) 
-
+render(<DatePicker />, root);
 
 getBlogs().then(res => {
     console.log(res)
