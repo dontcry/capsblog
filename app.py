@@ -8,10 +8,7 @@ def parse_body(body_data):
     return json_data
 
 def create_app(test_config=None):
-    app = Flask(__name__, 
-        template_folder="frontend/dist/",
-        static_folder="frontend/dist", 
-        static_url_path="") 
+    app = Flask(__name__) 
 
     print(app.config)
     setup_db(app) 
@@ -25,10 +22,7 @@ def create_app(test_config=None):
         response.headers.add('Access-Control-Allow-Methods',
                              'GET,PATCH,POST,DELETE,OPTIONS')
         return response
-
-    @app.route('/') 
-    def index():
-        return render_template('index.html')
+ 
 
     @app.route('/api/blogs')
     def show_blogs():
