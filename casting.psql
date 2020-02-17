@@ -21,22 +21,23 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: blog; Type: TABLE; Schema: public; Owner: lihr
+-- Name: movie; Type: TABLE; Schema: public; Owner: lihr
 --  
 
-DROP TABLE public.blog;  
+DROP TABLE public.movie;  
 
-CREATE TABLE IF NOT EXISTS public.blog (
+CREATE TABLE IF NOT EXISTS public.movie (
     id integer NOT NULL,
-    title text
+    title text,
+    poster text
 );
   
 
 --
--- Name: blog_id_seq; Type: SEQUENCE; Schema: public; Owner: lihr
+-- Name: movie_id_seq; Type: SEQUENCE; Schema: public; Owner: lihr
 --
 
-CREATE SEQUENCE IF NOT EXISTS public.blog_id_seq
+CREATE SEQUENCE IF NOT EXISTS public.movie_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -46,23 +47,18 @@ CREATE SEQUENCE IF NOT EXISTS public.blog_id_seq
  
  
 --
--- Name: blog id; Type: DEFAULT; Schema: public; Owner: lihr
+-- Name: movie id; Type: DEFAULT; Schema: public; Owner: lihr
 --
 
-ALTER TABLE ONLY public.blog ALTER COLUMN id SET DEFAULT nextval('public.blog_id_seq'::regclass);
+ALTER TABLE ONLY public.movie ALTER COLUMN id SET DEFAULT nextval('public.movie_id_seq'::regclass);
 
 
 --
--- Data for Name: blog; Type: TABLE DATA; Schema: public; Owner: lihr
+-- Data for Name: movie; Type: TABLE DATA; Schema: public; Owner: lihr
 --
 
-COPY public.blog (id, title) FROM stdin;
-1	Science
-2	Art
-3	Geography
-4	History
-5	Entertainment
-6	Sports
+COPY public.movie (id, title, poster) FROM stdin;
+1   1917   https://m.media-amazon.com/images/M/MV5BOTdmNTFjNDEtNzg0My00ZjkxLTg1ZDAtZTdkMDc2ZmFiNWQ1XkEyXkFqcGdeQXVyNTAzNzgwNTg@._V1_SY1000_CR0,0,631,1000_AL_.jpg
 \.
 
  

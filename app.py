@@ -25,7 +25,7 @@ def create_app(test_config=None):
     app = Flask(__name__) 
  
     setup_db(app) 
-    CORS(app, resource={r'/api/*': {'origins': '*'}})
+    CORS(app, resource={r'/api/*': {'origins': 'http://127.0.0.1:8080/'}})
     
     @app.after_request
     def after_request(response):
@@ -53,9 +53,22 @@ def create_app(test_config=None):
  
     @app.route('/api/actors')
     def actors():
-        result = Actor.query.all()
+        result = Actor.query.order_by('id').all()
         actors = [actor.format() for actor in result]
         return jsonify({'success': True, 'actors': actors})
+
+    @app.route('/api/actors/<int:actor_id>', methods=['GET']) 
+    def get_actor(actor_id): 
+        try:
+            actor = Actor.query.order_by('id').filter(
+                Actor.id == actor_id).one_or_none()
+            if actor is None:
+                abort(404) 
+            return jsonify({
+                'actor': actor.format(),
+                'success': True})
+        finally:
+            db.session.close()
 
     @app.route('/api/actors', methods=['POST']) 
     def create_actor():
@@ -63,7 +76,7 @@ def create_app(test_config=None):
         req_name = request_body['name'] 
         actor = Actor(name=req_name) 
         Actor.insert(actor) 
-        result = Actor.query.all()
+        result = Actor.query.order_by('id').all()
         actors = [actor.format() for actor in result]
         return jsonify({'success': True, 'actors': actors}) 
 
@@ -81,10 +94,10 @@ def create_app(test_config=None):
                 actor.age = request_body['age']
             if 'gender' in request_body:
                 actor.gender = request_body['gender']            
-            if 'age' in request_body:
-                actor.age = request_body['age']                
+            if 'photo' in request_body:
+                actor.photo = request_body['photo']                
             actor.update()
-            result = Actor.query.all()
+            result = Actor.query.order_by('id').all()
             actors = [actor.format() for actor in result]
             return jsonify({'success': True, 'actors': actors})
         except Exception:
@@ -102,7 +115,7 @@ def create_app(test_config=None):
             if actor is None:
                 abort(404)
             actor.delete()
-            result = Actor.query.all()
+            result = Actor.query.order_by('id').all()
             actors = [actor.format() for actor in result]
             return jsonify({'success': True, 'actors': actors})
         except Exception:
@@ -115,17 +128,34 @@ def create_app(test_config=None):
 
     @app.route('/api/movies')
     def movies():
-        result = Movie.query.all()
+        result = Movie.query.order_by('id').all()
         movies = [movie.format() for movie in result]
         return jsonify({'success': True, 'movies': movies})
+
+    @app.route('/api/movies/<int:movie_id>', methods=['GET']) 
+    def get_movie(movie_id): 
+        try:
+            movie = Movie.query.order_by('id').filter(
+                Movie.id == movie_id).one_or_none()
+            if movie is None:
+                abort(404) 
+            return jsonify({
+                'movie': movie.format(),
+                'success': True})
+        finally:
+            db.session.close()
 
     @app.route('/api/movies', methods=['POST']) 
     def create_movie():
         request_body = parse_body(request.get_data()) 
         req_title = request_body['title'] 
-        movie = Movie(title=req_title) 
+        movie = Movie(title=req_title)  
+        if 'release_date' in request_body:
+            movie.release_date = request_body['release_date']
+        if 'poster' in request_body:
+            movie.poster = request_body['poster']   
         Movie.insert(movie) 
-        result = Movie.query.all()
+        result = Movie.query.order_by('id').all()
         movies = [movie.format() for movie in result]
         return jsonify({'success': True, 'movies': movies}) 
 
@@ -144,7 +174,7 @@ def create_app(test_config=None):
             if 'poster' in request_body:
                 movie.poster = request_body['poster']                
             movie.update()
-            result = Movie.query.all()
+            result = Movie.query.order_by('id').all()
             movies = [movie.format() for movie in result]
             return jsonify({'success': True, 'movies': movies})
         except Exception:
@@ -162,7 +192,7 @@ def create_app(test_config=None):
             if movie is None:
                 abort(404)
             movie.delete()
-            result = Movie.query.all()
+            result = Movie.query.order_by('id').all()
             movies = [movie.format() for movie in result]
             return jsonify({'success': True, 'movies': movies})
         except Exception:

@@ -38,6 +38,8 @@ class Actor(db.Model):
     return {
       'id': self.id,
       'name': self.name,
+      'gender': self.gender,
+      'age': self.age,
       'photo': self.photo}
    
   def insert(self):
@@ -69,6 +71,7 @@ class Movie(db.Model):
         return {
       'id': self.id,
       'title': self.title,
+      'release_date': self.release_date,
       'poster': self.poster}
    
   def insert(self):
