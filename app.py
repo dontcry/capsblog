@@ -1,7 +1,21 @@
+import sys
 import json
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask, render_template, jsonify, request, abort
-from models import setup_db, db, Blog
+from user import get_access_token, get_users, get_user_info
+from models import setup_db, db, Actor, Movie, Cast
 from flask_cors import CORS
+
+access_token = ''
+
+def get_auth0_access_token():
+    global access_token 
+    access_token = get_access_token() 
+
+apsched = BackgroundScheduler()
+apsched.add_job(get_auth0_access_token, 'interval', seconds=1000)
+apsched.start()
+
 
 def parse_body(body_data):
     json_data = json.loads(body_data)
@@ -9,8 +23,7 @@ def parse_body(body_data):
 
 def create_app(test_config=None):
     app = Flask(__name__) 
-
-    print(app.config)
+ 
     setup_db(app) 
     CORS(app, resource={r'/api/*': {'origins': '*'}})
     
@@ -23,37 +36,153 @@ def create_app(test_config=None):
                              'GET,PATCH,POST,DELETE,OPTIONS')
         return response
  
+    @app.route('/api/userinfo')
+    def getUserInfo(): 
+        print('getUserInfo')
+        userinfo = get_user_info()
+        if userinfo:  
+            data = {
+                'success': True, 
+                'userinfo':userinfo
+            }  
+            return jsonify(data) 
+        else: 
+           abort(401)
 
-    @app.route('/api/blogs')
-    def show_blogs():
-        result = db.session.query(Blog).all()
-        blogs = [blog.format() for blog in result]
-        data = {
-            'success': True,
-            'blogs': blogs, 
-        } 
-        return jsonify(data) 
+    
+ 
+    @app.route('/api/actors')
+    def actors():
+        result = Actor.query.all()
+        actors = [actor.format() for actor in result]
+        return jsonify({'success': True, 'actors': actors})
 
-    @app.route('/api/blogs', methods=['POST'])
-    def create_blog():
+    @app.route('/api/actors', methods=['POST']) 
+    def create_actor():
+        request_body = parse_body(request.get_data()) 
+        req_name = request_body['name'] 
+        actor = Actor(name=req_name) 
+        Actor.insert(actor) 
+        result = Actor.query.all()
+        actors = [actor.format() for actor in result]
+        return jsonify({'success': True, 'actors': actors}) 
+
+    @app.route('/api/actors/<int:actor_id>', methods=['PATCH']) 
+    def update_actor(actor_id):
         request_body = parse_body(request.get_data())
         try:
-            blog = Blog(title=request_body['title']) 
-            db.session.add(blog) 
-            db.session.commit() 
-            data = {
-                'success': True,
-                'blog': blog.format(), 
-            } 
-            return jsonify(data) 
-        except:
+            actor = db.session.query(Actor).filter(
+                Actor.id == actor_id).one_or_none()
+            if actor is None:
+                abort(404) 
+            if 'name' in request_body:
+                actor.name = request_body['name'] 
+            if 'age' in request_body:
+                actor.age = request_body['age']
+            if 'gender' in request_body:
+                actor.gender = request_body['gender']            
+            if 'age' in request_body:
+                actor.age = request_body['age']                
+            actor.update()
+            result = Actor.query.all()
+            actors = [actor.format() for actor in result]
+            return jsonify({'success': True, 'actors': actors})
+        except Exception:
+            print(sys.exc_info())
+            db.session.rollback()
+            abort(422)
+        finally:
+            db.session.close()
+
+    @app.route('/api/actors/<int:actor_id>', methods=['DELETE']) 
+    def delete_actor(actor_id):
+        try:
+            actor = db.session.query(Actor).filter(
+                Actor.id == actor_id).one_or_none()
+            if actor is None:
+                abort(404)
+            actor.delete()
+            result = Actor.query.all()
+            actors = [actor.format() for actor in result]
+            return jsonify({'success': True, 'actors': actors})
+        except Exception:
+            print(sys.exc_info())
+            db.session.rollback()
+            abort(422)
+        finally:
+            db.session.close()
+
+
+    @app.route('/api/movies')
+    def movies():
+        result = Movie.query.all()
+        movies = [movie.format() for movie in result]
+        return jsonify({'success': True, 'movies': movies})
+
+    @app.route('/api/movies', methods=['POST']) 
+    def create_movie():
+        request_body = parse_body(request.get_data()) 
+        req_title = request_body['title'] 
+        movie = Movie(title=req_title) 
+        Movie.insert(movie) 
+        result = Movie.query.all()
+        movies = [movie.format() for movie in result]
+        return jsonify({'success': True, 'movies': movies}) 
+
+    @app.route('/api/movies/<int:movie_id>', methods=['PATCH']) 
+    def update_movie(movie_id):
+        request_body = parse_body(request.get_data())
+        try:
+            movie = db.session.query(Movie).filter(
+                Movie.id == movie_id).one_or_none()
+            if movie is None:
+                abort(404) 
+            if 'title' in request_body:
+                movie.title = request_body['title'] 
+            if 'release_date' in request_body:
+                movie.release_date = request_body['release_date']
+            if 'poster' in request_body:
+                movie.poster = request_body['poster']                
+            movie.update()
+            result = Movie.query.all()
+            movies = [movie.format() for movie in result]
+            return jsonify({'success': True, 'movies': movies})
+        except Exception:
+            print(sys.exc_info())
+            db.session.rollback()
+            abort(422)
+        finally:
+            db.session.close()
+
+    @app.route('/api/movies/<int:movie_id>', methods=['DELETE']) 
+    def delete_movie(movie_id):
+        try:
+            movie = db.session.query(Movie).filter(
+                Movie.id == movie_id).one_or_none()
+            if movie is None:
+                abort(404)
+            movie.delete()
+            result = Movie.query.all()
+            movies = [movie.format() for movie in result]
+            return jsonify({'success': True, 'movies': movies})
+        except Exception:
+            print(sys.exc_info())
             db.session.rollback()
             abort(422)
         finally:
             db.session.close()
 
     return app
+
 app = create_app()
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": "Unauthorized"
+    }), 401
 
 if __name__ == '__main__':
     app.run()

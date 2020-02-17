@@ -1,2 +1,2 @@
-psql capsblog < capsblog.psql
+psql UDACasting < casting.psql
 web: gunicorn app:app

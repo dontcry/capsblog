@@ -7,6 +7,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 DEBUG = True
 
 # Connect to the database 
-database_name = "capsblog"
+database_name = "UDACasting"
 database_url = 'localhost:5432' 
 SQLALCHEMY_DATABASE_URI = f'postgresql://:@{database_url}/{database_name}'

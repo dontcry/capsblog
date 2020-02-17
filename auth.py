@@ -6,7 +6,7 @@ from urllib.request import urlopen
 
 AUTH0_DOMAIN = 'lihr.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'api-coffee-shop'
+API_AUDIENCE = 'udacasting'
 
 # AuthError Exception
 '''
