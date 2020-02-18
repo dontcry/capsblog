@@ -29,7 +29,7 @@ class AuthError(Exception):
 
 # Auth Header
 def get_token_auth_header():
-    authorization = request.headers.get("Authorization")
+    authorization = request.headers.get("Authorization") 
     if not authorization:
         raise AuthError(
             {
@@ -42,6 +42,8 @@ def get_token_auth_header():
 
 def check_permissions(permission, payload):
     permissions = payload['permissions']
+    print(permission)
+    print(permissions)
     if permission in permissions:
         return True
     else:
@@ -52,8 +54,7 @@ def check_permissions(permission, payload):
             }, 401)
 
 
-def verify_decode_jwt(token):
-    print(token)
+def verify_decode_jwt(token): 
     # GET KEY DATA FROM AUTH0
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
@@ -124,7 +125,7 @@ def requires_auth(permission=''):
     def requires_auth_decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            token = get_token_auth_header()
+            token = get_token_auth_header() 
             payload = verify_decode_jwt(token)
             check_permissions(permission, payload)
             return f(*args, **kwargs)
